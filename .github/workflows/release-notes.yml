@@ -32,7 +32,8 @@ jobs:
           CONFLUENCE_URL="https://bagas-prakarso.atlassian.net/wiki"
 
           # Example using Confluence REST API (requires authentication and page creation logic)
-          curl -X POST -u CONFLUENCE_API_TOKEN -H 'Content-Type: application/json' \
+          curl -X POST -H "Authorization: Bearer $CONFLUENCE_API_TOKEN" \
+          -H 'Content-Type: application/json' \
           -d '{
             "type": "page",
             "title": "Release Notes - Version X.X.X",
