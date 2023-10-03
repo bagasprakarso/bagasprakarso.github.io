@@ -41,7 +41,7 @@ jobs:
             -d '{
               "type": "page",
               "title": "Release Notes - Version X.X.X",
-              "ancestors": [{"id": CONFLUENCE_PARENT_PAGE_ID}],
+              "ancestors": [{"id": $CONFLUENCE_PARENT_PAGE_ID}],
               "space": {
                 "key": "$CONFLUENCE_SPACE_KEY"
               },
