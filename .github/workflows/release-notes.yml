@@ -1,35 +1,38 @@
+---
 name: Create Confluence Release Notes
-
 on:
   release:
     types:
       - created
-
 jobs:
   create-release-notes:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
       - name: Create Release Notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_API_TOKEN }}
           CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY }}
           CONFLUENCE_PARENT_PAGE_ID: ${{ secrets.CONFLUENCE_PARENT_PAGE_ID }}
-
-        run: |
+        run: >
           # Fetch the release notes from the GitHub release
+
           RELEASE_NOTES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/bagasprakarso/bagasprakarso.github.io/releases/latest" | jq -r '.body')
 
+
           # Format the release notes into the desired table structure
+
           RELEASE_NOTES_TABLE=$(echo "$RELEASE_NOTES" | awk -F "by " '{printf "%s | %s | %s | %s | %s\n", NR, $1, $2, $3, $4}' | sed -E 's/\[.*?\]//g' | sed 's/\[\(.*\)\] (\(.*\))$/\1/' | sed 's/ | $//')
 
+
           # Create a new Confluence page with the formatted release notes
+
           # Use Confluence REST API or any Confluence API client to create the page
+
           CONFLUENCE_URL="https://bagas-prakarso.atlassian.net/wiki"
+
 
           # Example using Confluence REST API (requires authentication and page creation logic)
             
@@ -38,9 +41,9 @@ jobs:
             -d '{
               "type": "page",
               "title": "Release Notes - Version X.X.X",
-              "ancestors": [{"id": "$CONFLUENCE_PARENT_PAGE_ID"}],
+              "ancestors": [{"id": CONFLUENCE_PARENT_PAGE_ID}],
               "space": {
-                "key": "CONFLUENCE_SPACE_KEY"
+                "key": "$CONFLUENCE_SPACE_KEY"
               },
               "body": {
                 "storage": {
