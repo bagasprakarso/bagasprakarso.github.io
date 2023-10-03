@@ -22,7 +22,7 @@ jobs:
 
         run: |
           # Fetch the release notes from the GitHub release
-          RELEASE_NOTES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/YourOrg/YourRepo/releases/latest" | jq -r '.body')
+          RELEASE_NOTES=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/bagasprakarso/bagasprakarso.github.io/releases/latest" | jq -r '.body')
 
           # Format the release notes into the desired table structure
           RELEASE_NOTES_TABLE=$(echo "$RELEASE_NOTES" | awk -F "by " '{printf "%s | %s | %s | %s | %s\n", NR, $1, $2, $3, $4}' | sed -E 's/\[.*?\]//g' | sed 's/\[\(.*\)\] (\(.*\))$/\1/' | sed 's/ | $//')
@@ -32,21 +32,22 @@ jobs:
           CONFLUENCE_URL="https://bagas-prakarso.atlassian.net/wiki"
 
           # Example using Confluence REST API (requires authentication and page creation logic)
-          curl -X POST -H "Authorization: Bearer $CONFLUENCE_API_TOKEN" \
-          -H 'Content-Type: application/json' \
-          -d '{
-            "type": "page",
-            "title": "Release Notes - Version X.X.X",
-            "space": {
-              "key": "CONFLUENCE_SPACE_KEY"
-            },
-            "body": {
+            
+          curl -X POST -H "Authorization: Basic $CONFLUENCE_API_TOKEN" \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "type": "page",
+              "title": "Release Notes - Version X.X.X",
               "ancestors": [{"id": "$CONFLUENCE_PARENT_PAGE_ID"}],
-              "storage": {
-                "value": "<Your Release Notes Table>",
-                "representation": "storage"
+              "space": {
+                "key": "CONFLUENCE_SPACE_KEY"
+              },
+              "body": {
+                "storage": {
+                  "value": "$RELEASE_NOTES_TABLE",
+                  "representation": "storage"
+                }
               }
-            }
-          }' "$CONFLUENCE_URL/rest/api/content/"
+            }' "$CONFLUENCE_URL/rest/api/content/"
 
           echo "Release notes have been created in Confluence."
